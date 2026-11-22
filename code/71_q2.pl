@@ -74,3 +74,21 @@ tree_string(op(Op, L, R), A) :-
     atomic_list_concat([LA, Op, RA], A).
 
 wrap(A, W) :- atomic_list_concat(['(', A, ')'], W).
+
+% ---------------------------------------------------------------
+% P2.a / P2.b
+% ---------------------------------------------------------------
+
+% generate_equation(+List, -Equation): one valid equation, else fail.
+generate_equation(List, Equation) :-
+    once(equation(List, Equation)).
+
+% all_equations(+List, -Equations): all valid equations, sorted, no dups.
+all_equations(List, Equations) :-
+    findall(E, equation(List, E), Es),
+    sort(Es, Equations).
+
+% count_equations(+List, -N)
+count_equations(List, N) :-
+    all_equations(List, Equations),
+    length(Equations, N).
