@@ -34,18 +34,29 @@
         (my-reverse acc)
         (loop (cdr rest) (cons (f (car rest)) acc)))))
 
-;; ---------- S2.b: insert-if-short ----------
+;; ---------- S2.c: higher-order inserter ----------
+
+;; (make-inserter x len-ok?) returns a function of one list. That
+;; function puts x at the front of every list, at every level, whose
+;; original length satisfies len-ok?.
+;; Reading: process(lst) = map process over the sublists of lst, then
+;; cons x in front if len-ok?(length of the original lst).
+(define (make-inserter x len-ok?)
+  (letrec ((process
+            (lambda (lst)
+              (let ((new-lst (my-map (lambda (e)
+                                       (if (list-elem? e) (process e) e))
+                                     lst)))
+                (if (len-ok? (my-length lst))
+                    (cons x new-lst)
+                    new-lst)))))
+    process))
+
+;; ---------- S2.b: insert-if-short (defined with make-inserter) ----------
 
 ;; Insert x at the front of every list whose length is less than n.
-;; Reading: process the sublists first, then cons x in front if the
-;; original list is short enough.
 (define (insert-if-short x lst n)
-  (let ((new-lst (my-map (lambda (e)
-                           (if (list-elem? e) (insert-if-short x e n) e))
-                         lst)))
-    (if (< (my-length lst) n)
-        (cons x new-lst)
-        new-lst)))
+  ((make-inserter x (lambda (len) (< len n))) lst))
 
 ;; ---------- S2.a ----------
 
